@@ -24,13 +24,13 @@ To reduce algorithmic complexity from $\mathcal{O}(N^2)$ to $\mathcal{O}(N \log 
 ### 2. Feature Scaling & Data Transmission
 Following FFT computation, the magnitude of each frequency bin is calculated:
 
-$$\text{mag}[k] = \vert{}\text{Re}(X[k])\vert{} + \vert{}\text{Im}(X[k])\vert{}$$
+$$\text{mag}[k] = |\text{Re}(X[k])| + |\text{Im}(X[k])|$$
 
 To ensure efficient, low-overhead transmission over the 8-bit SPI bus, magnitude values are dynamic-range compressed and scaled from $0$ to $255$:
 
 $$\text{scaled}[k] = \frac{\text{mag}[k] \cdot 255.0}{\text{max\_val} + 10^{-6}}$$
 
-Additionally, the DC component ($\text{spi\_tx}[0] = 0$) is zeroed out to prevent baseline bias during machine learning inference.
+Additionally, the DC component (`spi_tx[0] = 0`) is zeroed out to prevent baseline bias during machine learning inference.
 
 ### 3. TinyML Classification
 The Raspberry Pi receives the 64-element feature vector and normalizes the input data using saved training statistics (mean $\mu$ and standard deviation $\sigma$):
