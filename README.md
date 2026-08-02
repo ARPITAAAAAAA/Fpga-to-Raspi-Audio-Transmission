@@ -28,7 +28,7 @@ $$\text{mag}[k] = |\text{Re}(X[k])| + |\text{Im}(X[k])|$$
 
 To ensure efficient, low-overhead transmission over the 8-bit SPI bus, magnitude values are dynamic-range compressed and scaled from $0$ to $255$:
 
-$$\text{scaled}[k] = \frac{\text{mag}[k] \cdot 255.0}{\text{max\_val} + 10^{-6}}$$
+$$\text{scaled}[k] = \frac{\text{mag}[k] \cdot 255.0}{\text{max}_{\text{val}} + 10^{-6}}$$
 
 Additionally, the DC component (`spi_tx[0] = 0`) is zeroed out to prevent baseline bias during machine learning inference.
 
