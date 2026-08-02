@@ -1,0 +1,50 @@
+import numpy as np
+
+# -----------------------------
+# Step 1: Simulated FFT patterns
+# -----------------------------
+
+fft_hi =        np.array([3.5, 7.2, 1.1, 0.5, 2.0, 4.3, 1.2, 0.9])
+fft_howareyou = np.array([6.5, 2.1, 5.4, 1.0, 3.2, 7.1, 2.2, 4.8])
+fft_bye =       np.array([0.8, 2.5, 7.7, 1.0, 6.8, 2.2, 5.9, 3.3])
+
+# -----------------------------
+# Step 2: Simple classifier
+# -----------------------------
+
+def predict(test_fft):
+    d0 = np.linalg.norm(test_fft - fft_hi)
+    d1 = np.linalg.norm(test_fft - fft_howareyou)
+    d2 = np.linalg.norm(test_fft - fft_bye)
+    
+    return np.argmin([d0, d1, d2])
+
+# -----------------------------
+# Step 3: Input
+# -----------------------------
+
+print("Type command (hi / how / bye): ")
+cmd = input().lower()
+
+if cmd == "hi":
+    test = fft_hi
+elif cmd == "how":
+    test = fft_howareyou
+elif cmd == "bye":
+    test = fft_bye
+else:
+    print("Unknown")
+    exit()
+
+label = predict(test)
+
+# -----------------------------
+# Step 4: Response
+# -----------------------------
+
+if label == 0:
+    print("Hello there! 😊")
+elif label == 1:
+    print("I'm doing great!")
+elif label == 2:
+    print("Goodbye! 👋")
