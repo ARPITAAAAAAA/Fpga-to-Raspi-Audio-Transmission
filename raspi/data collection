@@ -9,7 +9,7 @@ spi.mode = 0
 
 N = 64
 
-label = input("Enter label (hi / bye / how_are_you / noise): ")
+label = input("Enter label (hi / bye / how are you ): ")
 
 samples = []
 
@@ -23,7 +23,7 @@ try:
         for i, val in enumerate(data):
             print(f"{i}: {val}")
 
-        # store raw data 
+        #store raw data as-is
         samples.append(data)
 
         time.sleep(0.5)
