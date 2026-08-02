@@ -1,17 +1,39 @@
 import numpy as np
-from sklearn.svm import OneClassSVM
+from sklearn.svm import SVC
 import joblib
 
-# Load ONLY hi data
-hi = np.load("hi_samples.npy") ## name the model asper the data
+# ================= LOAD =================
+hi = np.load("hi_samples.npy")
+bye = np.load("bye_samples.npy")
+how = np.load("how are you_samples.npy")
 
-print("Shape:", hi.shape)
+# ================= LABELS =================
+X = np.vstack((hi, bye, how))
+y = np.array(
+    [0]*len(hi) +
+    [1]*len(bye) +
+    [2]*len(how)
+)
 
-# Train One-Class model
-model = OneClassSVM(gamma='auto', nu=0.3)
-model.fit(hi)
+print("HI:", len(hi), "BYE:", len(bye), "HOW:", len(how))
+print("Total:", X.shape)
 
-# Save model
+# ================= NORMALIZATION (IMPORTANT) =================
+X = X.astype(float)
+
+mean = np.mean(X, axis=0)
+std = np.std(X, axis=0) + 1e-6
+
+X = (X - mean) / std
+
+# Save normalization
+np.save("mean.npy", mean)
+np.save("std.npy", std)
+
+# ================= MODEL =================
+model = SVC(kernel='rbf', class_weight='balanced', probability=True)
+model.fit(X, y)
+
 joblib.dump(model, "model.pkl")
 
-print("One-class model trained!")
+print("Training complete!")
