@@ -1,0 +1,19 @@
+import spidev
+import time
+
+spi = spidev.SpiDev()
+spi.open(0, 0)   # bus 0, CE0
+spi.max_speed_hz = 500000
+spi.mode = 0
+
+N = 64
+
+while True:
+    # Send dummy bytes to clock data from FPGA
+    data = spi.xfer([0x00] * N)
+
+    print("Received FFT data:")
+    for i, val in enumerate(data):
+        print(f"{i}: {val}")
+
+    time.sleep(1)
