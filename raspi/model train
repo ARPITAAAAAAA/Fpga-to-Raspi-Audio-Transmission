@@ -1,0 +1,17 @@
+import numpy as np
+from sklearn.svm import OneClassSVM
+import joblib
+
+# Load ONLY hi data
+hi = np.load("hi_samples.npy") ## name the model asper the data
+
+print("Shape:", hi.shape)
+
+# Train One-Class model
+model = OneClassSVM(gamma='auto', nu=0.3)
+model.fit(hi)
+
+# Save model
+joblib.dump(model, "model.pkl")
+
+print("One-class model trained!")
