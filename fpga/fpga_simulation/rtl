@@ -1,0 +1,34 @@
+module fft_controller (
+    input wire clk,
+    input wire reset_n,
+    // ROM Interface
+    output reg [9:0] rom_addr,   // Assuming 1024 depth (2^10)
+    input wire [15:0] rom_data,  // Data from your .coe
+    // FFT AXIS Interface
+    output wire [31:0] s_axis_tdata,
+    output reg s_axis_tvalid,
+    input wire s_axis_tready,
+    output reg s_axis_tlast
+);
+
+    // FFT expects [Imaginary(31:16) | Real(15:0)]
+    // We put audio in Real and 0 in Imaginary
+    assign s_axis_tdata = {16'h0000, rom_data};
+
+    always @(posedge clk) begin
+        if (!reset_n) begin
+            rom_addr <= 0;
+            s_axis_tvalid <= 0;
+            s_axis_tlast <= 0;
+        end else if (s_axis_tready) begin
+            s_axis_tvalid <= 1;
+            rom_addr <= rom_addr + 1;
+            
+            // Pulse TLAST on the 1023rd sample (for 1024 FFT)
+            if (rom_addr == 1023) 
+                s_axis_tlast <= 1;
+            else
+                s_axis_tlast <= 0;
+        end
+    end
+endmodule
