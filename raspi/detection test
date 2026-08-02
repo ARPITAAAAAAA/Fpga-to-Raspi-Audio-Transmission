@@ -1,0 +1,35 @@
+import spidev
+import time
+import numpy as np
+import joblib
+
+# SPI setup
+spi = spidev.SpiDev()
+spi.open(0, 0)
+spi.max_speed_hz = 500000
+spi.mode = 0
+
+N = 64
+
+# Load trained model
+model = joblib.load("model.pkl")
+
+print("Detection started...\n")
+
+while True:
+    # Read data from FPGA
+    data = spi.xfer([0x00] * N)
+
+    # Convert to numpy
+    sample = np.array(data).reshape(1, -1)
+
+    # Prediction
+    pred = model.predict(sample)
+    score = model.decision_function(sample)
+
+    if score[0] > -0.5:
+        print("Detected: HI\n") # shall change based on what they are testing
+    else:
+        print("Unknown\n")
+
+    time.sleep(0.5)
