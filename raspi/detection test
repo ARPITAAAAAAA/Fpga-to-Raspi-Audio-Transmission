@@ -1,35 +1,62 @@
 import spidev
-import time
 import numpy as np
 import joblib
+import time
 
-# SPI setup
+# ================= SPI =================
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = 500000
 spi.mode = 0
 
+# ================= LOAD =================
+model = joblib.load("model.pkl")
+mean = np.load("mean.npy")
+std = np.load("std.npy")
+
+labels = ["HI", "BYE", "HOW ARE YOU"]
+
 N = 64
 
-# Load trained model
-model = joblib.load("model.pkl")
-
-print("Detection started...\n")
+print("Starting detection...\n")
 
 while True:
-    # Read data from FPGA
-    data = spi.xfer([0x00] * N)
+    raw = spi.xfer([0x00] * N)
+    fft = np.array(raw)
 
-    # Convert to numpy
-    sample = np.array(data).reshape(1, -1)
+    print("-------------------")
+    print("Raw:", fft.tolist())
 
-    # Prediction
-    pred = model.predict(sample)
-    score = model.decision_function(sample)
+    # ================= FILTER BAD DATA =================
+    if len(set(fft)) < 5:
+        print("Invalid SPI data\n")
+        time.sleep(0.5)
+        continue
 
-    if score[0] > -0.5:
-        print("Detected: HI\n") # shall change based on what they are testing
-    else:
-        print("Unknown\n")
+    if np.max(fft) < 10:
+        print("No signal\n")
+        time.sleep(0.5)
+        continue
+
+    # ================= NORMALIZATION =================
+    fft = fft.astype(float)
+    fft = (fft - mean) / std
+
+    fft = fft.reshape(1, -1)
+
+    # ================= PREDICTION =================
+    pred = model.predict(fft)[0]
+    probs = model.predict_proba(fft)[0]
+    confidence = max(probs)
+
+    print("Confidence:", confidence)
+
+    if confidence < 0.6:
+        print("Uncertain")
+        print("-------------------\n")
+        continue
+
+    print("Detected:", labels[pred])
+    print("-------------------\n")
 
     time.sleep(0.5)
