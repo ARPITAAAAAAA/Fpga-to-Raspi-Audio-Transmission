@@ -5,8 +5,7 @@ module tb_speech_system();
     reg reset_rtl_0;    // Clocking Wizard Reset (Usually Active-High)
     reg reset_rtl_1;    // Controller Reset (Usually Active-Low based on your 'n')
 
-    // 2. Instantiate the Wrapper (Replace 'design_1_wrapper' with your actual wrapper name)
-    // Note: Check the signal names in your wrapper file and match them here!
+    // 2. Instantiate the Wrapper
     design_1_wrapper dut (
         .clk_100MHz(clk_100mhz),
         .reset_rtl_0(reset_rtl_0), // Clocking Wizard reset
