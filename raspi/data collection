@@ -9,7 +9,7 @@ spi.mode = 0
 
 N = 64
 
-label = input("Enter label (hi / noise): ")
+label = input("Enter label (hi / bye / how_are_you / noise): ")
 
 samples = []
 
