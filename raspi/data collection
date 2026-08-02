@@ -1,0 +1,39 @@
+import spidev
+import time
+import numpy as np
+
+spi = spidev.SpiDev()
+spi.open(0, 0)   # bus 0, CE0
+spi.max_speed_hz = 500000
+spi.mode = 0
+
+N = 64
+
+label = input("Enter label (hi / noise): ")
+
+samples = []
+
+print("Collecting... Press Ctrl+C to stop")
+
+try:
+    while True:
+        data = spi.xfer([0x00] * N)
+
+        print("Received FFT data:")
+        for i, val in enumerate(data):
+            print(f"{i}: {val}")
+
+        # store raw data 
+        samples.append(data)
+
+        time.sleep(0.5)
+
+except KeyboardInterrupt:
+    pass
+
+samples = np.array(samples)
+
+filename = f"{label}_samples.npy"
+np.save(filename, samples)
+
+print(f"Saved {len(samples)} samples to {filename}")
