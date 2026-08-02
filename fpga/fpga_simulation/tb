@@ -1,0 +1,43 @@
+module tb_speech_system();
+
+    // 1. Signals to connect to your Block Design Wrapper
+    reg clk_100mhz;
+    reg reset_rtl_0;    // Clocking Wizard Reset (Usually Active-High)
+    reg reset_rtl_1;    // Controller Reset (Usually Active-Low based on your 'n')
+
+    // 2. Instantiate the Wrapper (Replace 'design_1_wrapper' with your actual wrapper name)
+    // Note: Check the signal names in your wrapper file and match them here!
+    design_1_wrapper dut (
+        .clk_100MHz(clk_100mhz),
+        .reset_rtl_0(reset_rtl_0), // Clocking Wizard reset
+        .reset_rtl_1(reset_rtl_1)  // FFT Controller reset_n
+    );
+
+    // 3. Generate 100MHz Clock (10ns period)
+    initial begin
+        clk_100mhz = 0;
+    end
+    always #5 clk_100mhz = ~clk_100mhz;
+
+    // 4. Stimulus Process
+    initial begin
+        // Initialize Resets
+        reset_rtl_0 = 1;     // Hold Clock Wizard in reset (Active High)
+        reset_rtl_1 = 0;     // Hold Controller in reset (Active Low)
+        
+        #100;                // Wait 100ns
+        
+        reset_rtl_0 = 0;     // Release Clock Wizard (Clock starts)
+        
+        #200;                // Wait for Clock Wizard to 'Lock'
+        reset_rtl_1 = 1;     // Release Controller reset
+        
+        // Let it run for the duration of the FFT
+        // Adjust time based on your .coe length (e.g., 50us)
+        #50000; 
+        
+        $display("Simulation Finished. Check the Waveform for m_axis_data_tvalid!");
+        $stop;
+    end
+
+endmodule
